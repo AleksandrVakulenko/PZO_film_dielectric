@@ -4,13 +4,15 @@ import serial
 import time
 import matplotlib.pyplot as plot
 from drawnow import *
+from extension import find_rlc
 
 # ===========================================
-T_target1 = np.uint16(350)  # Первая целевая температура
-T_target2 = np.uint16(30)  # Вторая целевая температура
+T_target1 = np.uint16(420)  # Первая целевая температура
+T_target2 = np.uint16(25)  # Вторая целевая температура
 rate = np.uint16(720)  # скорость
 # ===========================================
 
+# COM port connection
 ser = serial.Serial('COM4', baudrate=115200, timeout=30)
 ser.flushInput()
 
@@ -29,7 +31,6 @@ plot.ion()
 
 # создаем функцию для построения графика
 def make_fig():
-    # plt.ylim(-5000,5000)
     plot.title('Capacity')
     plot.grid(True)
     plot.xlabel('time, s')
@@ -38,12 +39,22 @@ def make_fig():
     plot.legend(loc='lower right')
 
 
+# log file creation
 f = open('mylog.txt', 'w')
 f.write('T_thermocontroller T_self C D R X\n')
+
+
+# RLC device connection (E4980AL only)
 rm = visa.ResourceManager()
-E4980AL = rm.open_resource('USB0::0x2A8D::0x2F01::MY54305367::INSTR')
-idn = E4980AL.query('*IDN?')
-print(idn)
+RLC_adr = find_rlc()
+if RLC_adr != 0:
+    E4980AL = rm.open_resource(RLC_adr)
+    idn = E4980AL.query('*IDN?')
+    print(idn)
+else:
+    E4980AL = -1
+    print('no RLC device found\n')
+    exit(-1)
 
 
 # init temp value
@@ -54,7 +65,7 @@ time_start = time.time()
 time_pass = 0
 
 flag1 = 0
-while time_pass < 3600:
+while time_pass < 3600 and flag1 != 2:
     time_pass = time.time() - time_start
     print(time_pass)
 
@@ -71,11 +82,6 @@ while time_pass < 3600:
     cnt = cnt + 1
     if cnt > 21600:
         val.pop(0)
-
-    # bytes_count = 0
-    # while not bytes_count:
-    #     bytes_count = ser.in_waiting
-    #     print(bytes_count)
 
     bytes_count = ser.in_waiting
     if bytes_count >= 44:
@@ -97,7 +103,7 @@ while time_pass < 3600:
         ser.write(control_data)
         delta = abs(T_target1 - temperature)
         print('delta=', delta)
-        if delta < 1:
+        if delta < 2:
             flag1 = 1
 
     if flag1 == 1:
@@ -111,14 +117,14 @@ while time_pass < 3600:
         ser.write(control_data)
         delta = abs(T_target2 - temperature)
         print('delta=', delta)
+        if delta < 2:
+            flag1 = 2
 
     temperature_str = str(temperature)
-    # print(value)
     T_str = str(-1)
     msg = temperature_str + ' ' + T_str + ' ' + values_arr_C_D[0] + ' ' + values_arr_C_D[1] + ' ' + values_arr_R_X[
         0] + ' ' + values_arr_R_X[1]
     print(msg)
     f.write(msg)
-
 
 E4980AL.close()
