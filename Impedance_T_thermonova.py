@@ -5,6 +5,8 @@ import time
 import matplotlib.pyplot as plot
 from drawnow import *
 from extension import find_rlc
+import keyboard
+
 
 # ===========================================
 T_target1 = np.uint16(420)  # Первая целевая температура
@@ -66,6 +68,10 @@ time_pass = 0
 
 flag1 = 0
 while time_pass < 3600 and flag1 != 2:
+    if keyboard.is_pressed('q'):  # if key 'q' is pressed
+        print('You Pressed A Key!')
+        break  # finishing the loop
+
     time_pass = time.time() - time_start
     print(time_pass)
 
@@ -127,4 +133,5 @@ while time_pass < 3600 and flag1 != 2:
     print(msg)
     f.write(msg)
 
+print('Closed!')
 E4980AL.close()
