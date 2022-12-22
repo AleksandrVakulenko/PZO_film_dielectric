@@ -1,0 +1,25 @@
+
+2022.12.21
+
+50 mV 10 kHz
+
+27 bad
+26 bad
+25 bad
+
+7 measure
+
+
+
+2022.12.22
+
+50 mV 10 kHz
+gold wire
+
+7 bad
+13 bad
+11 measure
+
+
+
+

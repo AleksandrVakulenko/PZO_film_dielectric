@@ -9,9 +9,9 @@ import keyboard
 
 
 # ===========================================
-T_target1 = np.uint16(420)  # Первая целевая температура
+T_target1 = np.uint16(425)  # Первая целевая температура
 T_target2 = np.uint16(25)  # Вторая целевая температура
-rate = np.uint16(720)  # скорость
+rate = np.uint16(150)  # скорость
 # ===========================================
 
 # COM port connection
@@ -42,7 +42,7 @@ def make_fig():
 
 
 # log file creation
-f = open('mylog.txt', 'w')
+f = open('mylog 2022_12_22_2.txt', 'w')
 f.write('T_thermocontroller T_self C D R X\n')
 
 
@@ -67,7 +67,7 @@ time_start = time.time()
 time_pass = 0
 
 flag1 = 0
-while time_pass < 3600 and flag1 != 2:
+while time_pass < 36000 and flag1 != 2:
     if keyboard.is_pressed('q'):  # if key 'q' is pressed
         print('You Pressed A Key!')
         break  # finishing the loop
@@ -85,9 +85,9 @@ while time_pass < 3600 and flag1 != 2:
     val.append(float(value))
     drawnow(make_fig)
 
-    cnt = cnt + 1
-    if cnt > 21600:
-        val.pop(0)
+    # cnt = cnt + 1
+    # if cnt > 21600:
+    #     val.pop(0)
 
     bytes_count = ser.in_waiting
     if bytes_count >= 44:
@@ -109,7 +109,7 @@ while time_pass < 3600 and flag1 != 2:
         ser.write(control_data)
         delta = abs(T_target1 - temperature)
         print('delta=', delta)
-        if delta < 2:
+        if delta < 5:
             flag1 = 1
 
     if flag1 == 1:
@@ -123,7 +123,7 @@ while time_pass < 3600 and flag1 != 2:
         ser.write(control_data)
         delta = abs(T_target2 - temperature)
         print('delta=', delta)
-        if delta < 2:
+        if delta < 5:
             flag1 = 2
 
     temperature_str = str(temperature)

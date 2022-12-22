@@ -1,8 +1,0 @@
-50 mV 10 kHz
-
-27 bad
-26 bad
-25 bad
-
-7 measure
-

@@ -27,8 +27,6 @@ Eps = C*H/(S*Eps0);
 
 Eps2 = Eps.*D;
 
-Temp = Temp*(0.73 + 0.1); % TEMP COMPENSATION
-
 Temp_heat = Temp(1:round(end/2));
 Temp_cool = Temp(round(end/2)+1:end);
 Eps1_heat = Eps(1:round(end/2));
