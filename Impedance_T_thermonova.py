@@ -1,103 +1,62 @@
-import numpy as np
 import time
-import matplotlib.pyplot as plot
-from drawnow import drawnow
 import keyboard
-import RLC_extension
-import Temp_extension
+import draw_lib
+from RLC_extension import LCRmeter
+from Temp_extension import TempController
+from Log_files import LogFile
 
 # ===========================================
-T_target1 = np.uint16(425)  # Первая целевая температура
-T_target2 = np.uint16(30)  # Вторая целевая температура
-rate = np.uint16(150)  # скорость
+T_target1 = 425  # [C] (Первая целевая температура)
+T_target2 = 30  # [C] (Вторая целевая температура)
+rate = 150  # [C/min] (скорость)
+measurement_frequency = 1000  # [Hz]
+measurement_voltage = 0.05  # [V]
 com_port_name = 'COM4'
-log_file_name = 'log 2022_12_23_1.txt'
+log_file_name = 'log 2022_12_XX_test.txt'
 # ===========================================
 delta_limit = T_target1 / 90
 
+# connect to LCR
+lcr_device = LCRmeter()
+lcr_device.set_frequency(measurement_frequency)
+lcr_device.set_voltage(measurement_voltage)
 
-# COM port connection
-ser = Temp_extension.connect(com_port_name)
-# initially set temp and rate
-Temp_extension.set_temp_rate(ser, T_target1, rate)
-
-val = []
-cnt = 0
-plot.ion()
-
-# создаем функцию для построения графика
-def make_fig():
-    plot.title('Capacity')
-    plot.grid(True)
-    plot.xlabel('time, s')
-    plot.ylabel('C, F')
-    plot.plot(val, 'ro-', label='Channel 0')
-    plot.legend(loc='lower right')
-
+# connect to thermocontroller
+temp_device = TempController(com_port_name)
+temp_device.set_temp_rate(T_target1, rate)
 
 # log file creation
-f = open(log_file_name, 'w')
-f.write('T_thermocontroller T_self C D R X\n')
+log_file_obj = LogFile(log_file_name)
 
-
-# RLC device connection (E4980AL only)
-E4980AL = RLC_extension.connect()
-
-
-# init temp value
-ser_bytes = ser.read(44)
-temperature = ((ser_bytes[4] << 8) + (ser_bytes[5])) / 100
-
+# Main cycle start
+flag_temp_phase = 0  # 0 - heat, 1 - cool, 2 - cool ended
 time_start = time.time()
-time_pass = 0
-
-flag_temp_phase = 0
 while flag_temp_phase != 2:
-    # close by q key
-    if keyboard.is_pressed('q'):
+    if keyboard.is_pressed('q'):  # close by q key
         print('You Pressed q Key!')
-        break  # finishing the loop
+        break
 
+    # update all variables
     time_pass = time.time() - time_start
-    print(time_pass)
+    temperature = temp_device.get_temp()
+    c_d_r_x = lcr_device.get_c_d_r_x()
 
-    c_d_r_x = RLC_extension.get_data(E4980AL)
-    values_arr_C_D = [c_d_r_x[0], c_d_r_x[1]]
-    values_arr_R_X = [c_d_r_x[2], c_d_r_x[3]]
-    value = (values_arr_C_D[0])  # for plotting
-
-    val.append(float(value))
-    drawnow(make_fig)
-
-    bytes_count = ser.in_waiting
-    if bytes_count >= 44:
-        ser_bytes = ser.read(44)
-        temperature = ((ser_bytes[4] << 8) + (ser_bytes[5])) / 100
-        print('Thermocontroller:', temperature, '\n')
-        ser.flushInput()
-    else:
-        pass
-
+    # check temperature phases
     if temperature < T_target1 and flag_temp_phase == 0:
-        Temp_extension.set_temp_rate(ser, T_target1, rate)
+        temp_device.set_temp_rate(T_target1, rate)
         delta = abs(T_target1 - temperature)
         if delta < delta_limit:
             flag_temp_phase = 1
 
     if flag_temp_phase == 1:
-        Temp_extension.set_temp_rate(ser, T_target1, rate)
+        temp_device.set_temp_rate(T_target2, rate)
         delta = abs(T_target2 - temperature)
         if delta < delta_limit:
             flag_temp_phase = 2
 
-    temperature_str = str(temperature)
-    T_str = str(-1)
-    msg = temperature_str + ' ' + T_str + ' ' + values_arr_C_D[0] + ' ' + values_arr_C_D[1] + ' ' + values_arr_R_X[
-        0] + ' ' + values_arr_R_X[1]
-    print(msg)
-    f.write(msg)
+    # draw to window and print to log file
+    draw_lib.draw_figure(time_pass, temperature, c_d_r_x)
+    log_file_obj.print(time_pass, temperature, c_d_r_x)
 
-ser.close()
-print('COM port closed')
-RLC_extension.disconnect(E4980AL)
-print('RLC closed!')
+
+
