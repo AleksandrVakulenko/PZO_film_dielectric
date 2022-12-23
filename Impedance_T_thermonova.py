@@ -85,10 +85,6 @@ while time_pass < 36000 and flag1 != 2:
     val.append(float(value))
     drawnow(make_fig)
 
-    # cnt = cnt + 1
-    # if cnt > 21600:
-    #     val.pop(0)
-
     bytes_count = ser.in_waiting
     if bytes_count >= 44:
         ser_bytes = ser.read(44)
