@@ -1,4 +1,5 @@
 import pyvisa as visa
+import time
 
 resource_manager = visa.ResourceManager()
 
@@ -46,19 +47,10 @@ def get_data(device):
     return c_d_r_x
 
 
-def set_frequency(device, volt, freq, delimiter=','):
-    if delimiter == ',':
-        device.query(':VOLTage: LEVel ' + str(volt).replace('.', ','))
-        device.query(':FREQuency: CW ' + str(freq).replace('.', ','))
-    elif delimiter == '.':
-        device.query(':VOLTage: LEVel ' + str(volt))
-        device.query(':FREQuency: CW ' + str(freq))
+def set_frequency(device, volt, freq):
+    device.write(':VOLTage:LEVel ' + str(volt))
+    time.sleep(0.25)
+    device.write(':FREQuency:CW ' + str(freq))
 
 
-# def set_frequency(volt, freq, delimiter=','):
-#     if delimiter == ',':
-#         print(':VOLTage: LEVel ' + str(volt).replace('.', ','))
-#         print(':FREQuency: CW ' + str(freq).replace('.', ','))
-#     elif delimiter == '.':
-#         print(':VOLTage: LEVel ' + str(volt))
-#         print(':FREQuency: CW ' + str(freq))
+
