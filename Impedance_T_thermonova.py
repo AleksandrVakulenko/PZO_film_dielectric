@@ -56,7 +56,7 @@ while flag_temp_phase != 2:
 
     # draw to window and print to log file
     draw_lib.draw_figure(time_pass, temperature, c_d_r_x)
-    log_file_obj.print(time_pass, temperature, c_d_r_x)
+    log_file_obj.print(time_pass, temperature, measurement_frequency, c_d_r_x)
 
 
 

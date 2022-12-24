@@ -3,6 +3,7 @@ import time
 
 
 class LCRmeter:
+    __cmd_wait_time = 0.1
     __resource_manager = visa.ResourceManager()
     __device: __resource_manager.open_resource
 
@@ -14,15 +15,24 @@ class LCRmeter:
     def __del__(self):
         self.__disconnect()
 
+    # TODO: leave only 2 methods to set
     def set_voltage(self, volt=0.01):
-        # TODO: add return of real values
         self.__device.write(':VOLTage:LEVel ' + str(volt))
-        time.sleep(0.2)
+        time.sleep(self.__cmd_wait_time)
+
+    def set_get_voltage(self, volt=0.01):
+        self.set_voltage(volt)
+        out_volt = self.__device.query(':VOLTage:LEVel?')
+        return out_volt
 
     def set_frequency(self, freq=1000):
-        # TODO: add return of real values
         self.__device.write(':FREQuency:CW ' + str(freq))
-        time.sleep(0.2)
+        time.sleep(self.__cmd_wait_time)
+
+    def set_get_frequency(self, freq=1000):
+        self.set_frequency(freq)
+        out_freq = self.__device.query(':FREQuency:CW?')
+        return out_freq
 
     def get_c_d_r_x(self) -> list[float]:
         z = self.__device.query(':FETCh:IMPedance:FORmatted?')
@@ -64,7 +74,7 @@ class LCRmeter:
 
     def __disconnect(self):
         self.__device.close()
-        print('RLC device disconnected')
+        print('RLC device CLOSED')
 
 
 

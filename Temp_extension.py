@@ -15,9 +15,9 @@ class TempController:
     def __del__(self):
         if hasattr(self, '__serial_obj'):
             self.__serial_obj.close()
-            print('COM port closed')
+            print('COM port to thermocontroller CLOSED')
         else:
-            print('nothing to close')
+            print('thermocontroller COM port: nothing to close')
 
     def set_temp_rate(self, temp_target=25, temp_rate=360/3):
         temp_rate = np.uint16(temp_rate)
