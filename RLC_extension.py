@@ -5,7 +5,7 @@ import time
 class LCRmeter:
     __cmd_wait_time = 0.1
     __resource_manager = visa.ResourceManager()
-    __device: __resource_manager.open_resource
+    __device: __resource_manager.open_resource # FIXME: wrong line
 
     def __init__(self):
         self.__device = self.__connect()
@@ -47,7 +47,7 @@ class LCRmeter:
 
     # -----------------------------------PRIVATE PART---------------------------------------
     def __find_rlc(self):
-        rm_list = self.__resource_manager
+        rm_list = self.__resource_manager.list_resources()
         for adr in rm_list:
             # print(name)
             try:
