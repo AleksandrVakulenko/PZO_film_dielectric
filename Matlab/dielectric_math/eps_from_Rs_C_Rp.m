@@ -10,7 +10,7 @@ cap0 = eps0*surf/h;
 R_series = 50000; %Ohm
 R_parallel = 100e6; %Ohm
 C = 1e-9; %F
-X = 1./(2*pi*i*freq*C);
+X = 1./(2*pi*1i*freq*C);
 
 
 % z_film = R_series + X; %series
