@@ -7,7 +7,7 @@ h = 100e-9; %m
 eps0 = 8.85e-12; %F/m
 cap0 = eps0*surf/h;
 
-R_series = 50000; %Ohm
+R_series = 5000; %Ohm
 R_parallel = 100e6; %Ohm
 C = 1e-9; %F
 X = 1./(2*pi*1i*freq*C);
@@ -27,8 +27,12 @@ z1 = real(z_full);
 z2 = imag(z_full);
 
 
-eps1 = -z2./(2*pi*cap0*freq.*(z1.^2+z2.^2));
-eps2 =  z1./(2*pi*cap0*freq.*(z1.^2+z2.^2));
+eps_cpx = 1./(2*pi*cap0*freq.*(z1 + 1i*z2));
+eps1 = imag(eps_cpx);
+eps2 = real(eps_cpx);
+
+% eps1 = -z2./(2*pi*cap0*freq.*(z1.^2+z2.^2));
+% eps2 =  z1./(2*pi*cap0*freq.*(z1.^2+z2.^2));
 
 
 
