@@ -2,7 +2,6 @@ PZO (001), 28.12.22
 Diameter[mm] 7.000e-02  Thickness[mm] 1.000e-04  Spacer Capacity[pF] 0.000e+00  Spacer Area[mm^2] 0.000e+00
 Fixed value(s) :  Temp. [K]=1.7000e+02  AC Volt  [Vrms]=5.000e-02
  Freq. [Hz]	 Eps'	 Eps''
-2.00000e+01	1.25928e+02	8.97736e+01
 2.80000e+01	3.74682e+02	1.18794e+02
 3.92000e+01	3.63069e+02	9.76881e+01
 5.48800e+01	3.53850e+02	8.00702e+01
